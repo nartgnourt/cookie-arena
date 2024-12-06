@@ -44,3 +44,30 @@ Nhập vào payload `; ls /`, chúng ta xác định được có file `flag.txt
 Để đọc flag, chúng ta dùng payload `; cat /flag.txt`.
 
 ![image](images/nslookup-level-1/image-3.png)
+
+## NSLookup (Level 2)
+
+> Challenge này cung cấp một công cụ tra cứu DNS (Domain Name System) đơn giản, cho phép người dùng nhập tên miền (domain) vào ô nhập liệu, và chương trình sẽ trả về kết quả của lệnh nslookup. Đây là một ví dụ cho lỗ hổng OS Command Injection, nơi đầu vào không được kiểm tra đúng cách, cho phép thực thi các lệnh hệ thống ngoài ý muốn.
+>
+> **Cách hoạt động**:
+>
+> Người dùng nhập tên miền vào biểu mẫu (form).
+> Tên miền được xử lý và truyền vào lệnh nslookup thông qua shell_exec().
+> Kết quả được hiển thị lại trong trình duyệt.
+>
+> **Mục tiêu**: Khai thác lỗ hổng Command Injection để truy cập và đọc nội dung file /flag.txt trên máy chủ.
+>
+> **Nhiệm vụ**:
+>
+> Tìm cách chèn lệnh độc hại thông qua trường nhập domain.
+> Kích hoạt thực thi lệnh tùy ý trên máy chủ để trích xuất nội dung file flag.txt.
+
+Đến với level 2 này, lập trình viên đã đưa giá trị của tham số `domain` vào trong cặp dấu nháy `''`.
+
+![image](images/nslookup-level-2/image-1.png)
+
+Như vậy, chúng ta cần phải escape khỏi cặp dấu đó mới có thể thực thi được lệnh tuỳ ý.
+
+Chúng ta có thể sử dụng payload ngắn gọn như `';cat /f*;'` để lấy flag. Ở payload này sử dụng wildcard `*` để khớp với tất cả các ký tự, nó rất hữu ích trong những trường hợp mà chúng ta không biết tên file.
+
+![image](images/nslookup-level-2/image-2.png)
