@@ -138,3 +138,29 @@ if __name__ == "__main__":
     read_flag(filename)
 
 ```
+
+## Jinja2 VCard Generator
+
+> Trang web cho phép bạn tạo và tải về VCard miễn phí. Hãy khai thác lỗ hổng Server Side Template Injection để đọc nội dung file `/flag.txt`
+
+Bên dưới là giao diện của trang web khi chúng ta truy cập:
+
+![image](images/jinja2-vcard-generator/image-1.png)
+
+Tên của thử thách cùng với phần mô tả cũng đã nói cho chúng ta biết là cần khai thác Jinja2 SSTI để lấy flag.
+
+Bên dưới là POST request khi chúng ta nhập đầy đủ các trường thông tin và nhấn "Create".
+
+![image](images/jinja2-vcard-generator/image-2.png)
+
+Sau khi thử lần lượt payload `{{7*7}}` ở các trường, chúng ta sẽ xác định được tại tham số `phone` dính SSTI:
+
+![image](images/jinja2-vcard-generator/image-3.png)
+
+Vậy, chúng ta ta có thể truyền payload cơ bản bên dưới vào tham số `phone` để đọc thành công flag.
+
+```text
+{{lipsum.__globals__.os.popen('cat /flag.txt').read()}}
+```
+
+![image](images/jinja2-vcard-generator/image-4.png)
