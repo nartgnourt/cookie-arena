@@ -33,7 +33,7 @@ Mô tả của thử thách cũng đã rất rõ ràng, đây là một trang we
 
 ![image](images/nslookup-level-1/image-1.png)
 
-Chúng ta có thể thấy, dữ liệu đầu vào qua tham số `domain` lấy từ URL không được xử lý mà được truyền thằng vào hàm `shell_exec()`, cho phép chúng ta thực thi lệnh hệ thống tuỳ ý.
+Chúng ta có thể thấy, dữ liệu đầu vào qua tham số `domain` lấy từ URL không được xử lý mà được truyền thẳng vào hàm `shell_exec()`, cho phép chúng ta thực thi lệnh hệ thống tuỳ ý.
 
 Do `domain` truyền vào phía sau lệnh `nslookup` nên chúng ta sẽ kết hợp sử dụng dấu `;` để thực thi một loạt các lệnh.
 
@@ -164,3 +164,31 @@ Vậy, chúng ta ta có thể truyền payload cơ bản bên dưới vào tham 
 ```
 
 ![image](images/jinja2-vcard-generator/image-4.png)
+
+## Mass Assignment Profile
+
+> Sử dụng tài khoản `alice` và mật khẩu `alice` để truy cập vào hệ thống quản lý hồ sơ. Mỗi tài khoản chứa các thông tin cơ bản như email, username, email, điện thoại, địa chỉ. Mỗi người chỉ được phép thay đổi các thông tin cơ bản này.
+>
+> Trên máy chủ có file Flag nằm ở `/flag.txt` và có nội dung `CHH{XXX}`. File này chỉ được hiển thị với người dùng có vai trò `admin`
+>
+> Mục tiêu của bạn? Tìm cách để xem được nội dung này
+
+Truy cập trang web, chúng ta thấy một giao diện đăng nhập:
+
+![image](images/mass-assignment-profile/image-1.png)
+
+Sau khi đăng nhập với tài khoản `alice:alice`, chúng ta được chuyển tới `profile.php`. Có thể thấy chúng ta đang không phải là `admin` nên không thể xem flag:
+
+![image](images/mass-assignment-profile/image-2.png)
+
+Chúng ta thử nhấn "Update" để cập nhật thông tin người dùng này.
+
+Dưới đây là POST request để cập nhật.
+
+![image](images/mass-assignment-profile/image-3.png)
+
+Theo tên thử thách, chúng ta hiểu rằng trang web dính lỗ hổng [Mass Assignment](https://learn.snyk.io/lesson/mass-assignment/), cho phép thêm tham số không như ý định của lập trình viên vào request.
+
+Vậy chúng ta có thể thêm `&role=admin` vào để lấy flag thành công.
+
+![image](images/mass-assignment-profile/image-4.png)
